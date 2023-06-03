@@ -1,4 +1,5 @@
+mod controls;
 mod host;
-mod text_widget;
+mod info;
 pub mod ui;
 mod widgets;
