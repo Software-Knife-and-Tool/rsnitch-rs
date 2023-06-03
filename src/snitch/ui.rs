@@ -1,45 +1,37 @@
 //  SPDX-FileCopyrightText: Copyright 2023 James M. Putnam (putnamjm.design@gmail.com)
 //  SPDX-License-Identifier: MIT
 #![allow(clippy::collapsible_match)]
-#![allow(unused_imports)]
+
 use {
-    crate::{
-        snitch::{host::Host, text_widget::TextWidget, widgets::quad::quad},
-        Environment,
-    },
+    super::{controls::Controls, host::Host, info::InfoBox, widgets::quad::quad},
+    crate::Environment,
     iced::{
-        executor,
-        keyboard::Event::CharacterReceived,
-        subscription, theme,
-        widget::{button, column, container, row, rule, text, Column, Space, Text},
-        window, Alignment, Application, Color, Command, Element, Event, Length, Subscription,
-        Theme,
+        executor, subscription, theme,
+        widget::{container, text, Column},
+        window, Alignment, Application, Command, Element, Event, Length, Subscription, Theme,
     },
-    iced_aw::{grid, Grid},
-    serde::{Deserialize, Serialize},
-    serde_json::{Result as SerdeResult, Value},
-    time::{self, OffsetDateTime},
+    iced_aw::Grid,
+    std::sync::RwLock,
+    time,
 };
 
-use std::sync::RwLock;
-
 pub struct Ui {
+    controls: Controls,
     env: Environment,
-    hosts: Option<Vec<Host>>,
     groups: Vec<String>,
-    filter: RwLock<String>,
-    states: RwLock<Vec<bool>>,
+    hosts: Option<Vec<Host>>,
+    info_box: InfoBox,
     last: Vec<Event>,
-    text_widget: TextWidget,
+    states: RwLock<Vec<bool>>,
 }
 
 #[derive(Debug, Clone)]
 pub enum Message {
-    HostPress(usize),
-    GroupPress(usize),
     Clear,
-    EventOccurred(Event),
     ClockTick(time::OffsetDateTime),
+    EventOccurred(Event),
+    GroupPress(usize),
+    HostPress(usize),
     Poll,
 }
 
@@ -49,7 +41,7 @@ impl Ui {
 
     pub fn effective_hid(&self, id: usize, name: &String) -> usize {
         let hosts = self.hosts.as_ref().unwrap();
-        let filter = self.filter.read().unwrap();
+        let filter = self.controls.get_filter();
 
         if filter.is_empty() {
             id
@@ -87,13 +79,13 @@ impl Application for Ui {
         }
 
         let ui = Ui {
-            last: Vec::<Event>::new(),
-            text_widget: TextWidget::new(6, 80),
-            filter: RwLock::new(String::new()),
-            hosts,
-            groups,
-            states: RwLock::new(states),
+            controls: Controls::new(),
             env,
+            groups,
+            hosts,
+            info_box: InfoBox::new(6, 80),
+            last: Vec::<Event>::new(),
+            states: RwLock::new(states),
         };
 
         (ui, Command::none())
@@ -114,30 +106,22 @@ impl Application for Ui {
                 None => (),
             },
             Message::GroupPress(id) => {
-                let mut filter = self.filter.write().unwrap();
-
-                *filter = self.groups[id].clone();
+                self.controls.set_filter(self.groups[id].clone());
             }
             Message::Clear => {
-                let mut filter = self.filter.write().unwrap();
-
-                *filter = String::new();
+                self.controls.set_filter(String::new());
             }
             Message::HostPress(id) => {
                 let host = &self.hosts.as_ref().unwrap()[id];
 
-                self.text_widget.clear();
-                self.text_widget
-                    .write_string(format!("host: {}", host.host));
-                self.text_widget.scroll();
-                self.text_widget
-                    .write_string(format!("group: {}", host.group));
-                self.text_widget.scroll();
-                self.text_widget
-                    .write_string(format!("label: {}", host.label));
-                self.text_widget.scroll();
-                self.text_widget
-                    .write_string(format!("info: {}", Host::info(host)));
+                self.info_box.clear();
+                self.info_box.write(format!("host: {}", host.host));
+                self.info_box.scroll();
+                self.info_box.write(format!("group: {}", host.group));
+                self.info_box.scroll();
+                self.info_box.write(format!("label: {}", host.label));
+                self.info_box.scroll();
+                self.info_box.write(format!("info: {}", Host::info(host)));
             }
             Message::ClockTick(_t) => match &self.hosts {
                 Some(hosts) => {
@@ -170,11 +154,10 @@ impl Application for Ui {
     }
 
     fn view(&self) -> Element<Message> {
-        let txt = Column::new().push(text(self.text_widget.contents()));
         let hosts = self.hosts.as_ref().unwrap();
         let states = self.states.read().unwrap();
         let groups = &self.groups;
-        let filter = self.filter.read().unwrap();
+        let filter = self.controls.get_filter();
 
         let grid_spacer = "                                 ";
 
@@ -222,22 +205,15 @@ impl Application for Ui {
             );
         }
 
-        let control_panel = row![
-            iced::widget::button(text("clear filter")).on_press(Message::Clear),
-            iced::widget::button(text("poll")).on_press(Message::Poll),
-        ];
-
         let content = Column::new()
             .align_items(Alignment::Start)
             .spacing(20)
-            .push(text("rsnitch-rs: v0.0.1".to_string()).size(28))
-            .push(quad(500, 1))
             .push(group_grid)
-            .push(txt.height(120))
+            .push(quad(500, 1))
+            .push(self.info_box.view())
             .push(button_grid)
             .push(quad(500, 1))
-            .push(text(format!("filter: {}", filter)))
-            .push(control_panel.width(500).align_items(Alignment::End));
+            .push(self.controls.view());
 
         container(content)
             .width(Length::Fill)

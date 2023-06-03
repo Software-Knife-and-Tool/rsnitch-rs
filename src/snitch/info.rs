@@ -2,10 +2,22 @@
 //  SPDX-License-Identifier: MIT
 #![allow(unused_imports)]
 
-use {crate::Environment, std::sync::RwLock};
+use {
+    super::ui::Message,
+    crate::Environment,
+    iced::{
+        executor,
+        keyboard::Event::CharacterReceived,
+        subscription, theme,
+        widget::{button, column, container, row, rule, text, Column, Space, Text},
+        window, Alignment, Application, Color, Command, Element, Event, Length, Subscription,
+        Theme,
+    },
+    std::sync::RwLock,
+};
 
 #[derive(Debug, Default)]
-pub struct TextWidget {
+pub struct InfoBox {
     image: RwLock<String>,
     lines: RwLock<Vec<String>>,
     rows: usize,
@@ -13,37 +25,37 @@ pub struct TextWidget {
 }
 
 #[derive(Debug, Default)]
-pub struct TextWidgetBuilder {
+pub struct InfoBoxBuilder {
     rows: Option<usize>,
     cols: Option<usize>,
 }
 
-impl TextWidgetBuilder {
+impl InfoBoxBuilder {
     const ROWS: usize = 25;
     const COLS: usize = 80;
 
     pub fn new() -> Self {
-        TextWidgetBuilder {
+        InfoBoxBuilder {
             rows: None,
             cols: None,
         }
     }
 
     pub fn rows(&self, rows: usize) -> Self {
-        TextWidgetBuilder {
+        InfoBoxBuilder {
             rows: Some(rows),
             cols: self.cols,
         }
     }
 
     pub fn cols(&self, cols: usize) -> Self {
-        TextWidgetBuilder {
+        InfoBoxBuilder {
             rows: self.rows,
             cols: Some(cols),
         }
     }
 
-    pub fn build(&self) -> TextWidget {
+    pub fn build(&self) -> InfoBox {
         let rows = match self.rows {
             Some(rows) => rows,
             None => Self::ROWS,
@@ -54,7 +66,7 @@ impl TextWidgetBuilder {
             None => Self::COLS,
         };
 
-        TextWidget {
+        InfoBox {
             image: RwLock::new(String::new()),
             lines: RwLock::new(vec![String::new(); rows]),
             rows,
@@ -63,9 +75,9 @@ impl TextWidgetBuilder {
     }
 }
 
-impl TextWidget {
+impl InfoBox {
     pub fn new(rows: usize, cols: usize) -> Self {
-        TextWidget {
+        InfoBox {
             image: RwLock::new(String::new()),
             lines: RwLock::new(vec![String::new(); rows]),
             rows,
@@ -140,7 +152,7 @@ impl TextWidget {
         self.collapse()
     }
 
-    pub fn write_string(&self, str: String) {
+    pub fn write(&self, str: String) {
         {
             let mut lines = self.lines.write().unwrap();
 
@@ -154,5 +166,9 @@ impl TextWidget {
         let image = self.image.read().unwrap();
 
         image.clone()
+    }
+
+    pub fn view(&self) -> Element<Message> {
+        Column::new().push(text(self.contents())).into()
     }
 }
