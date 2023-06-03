@@ -3,7 +3,9 @@
 #![allow(clippy::collapsible_match)]
 
 use {
-    super::{controls::Controls, host::Host, info::InfoBox, widgets::quad::quad},
+    super::{
+        controls::Controls, host::Host, info::InfoBox, statusbar::StatusBar, widgets::quad::quad,
+    },
     crate::Environment,
     iced::{
         executor, subscription, theme,
@@ -23,6 +25,7 @@ pub struct Ui {
     info_box: InfoBox,
     last: Vec<Event>,
     states: RwLock<Vec<bool>>,
+    status_bar: StatusBar,
 }
 
 #[derive(Debug, Clone)]
@@ -78,6 +81,8 @@ impl Application for Ui {
             None => (),
         }
 
+        let status_bar = StatusBar::new(&env, String::new());
+
         let ui = Ui {
             controls: Controls::new(),
             env,
@@ -86,6 +91,7 @@ impl Application for Ui {
             info_box: InfoBox::new(6, 80),
             last: Vec::<Event>::new(),
             states: RwLock::new(states),
+            status_bar,
         };
 
         (ui, Command::none())
@@ -213,7 +219,9 @@ impl Application for Ui {
             .push(self.info_box.view())
             .push(button_grid)
             .push(quad(500, 1))
-            .push(self.controls.view());
+            .push(self.controls.view())
+            .push(quad(500, 1))
+            .push(self.status_bar.view());
 
         container(content)
             .width(Length::Fill)
