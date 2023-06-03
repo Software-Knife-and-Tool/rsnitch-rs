@@ -1,10 +1,14 @@
 ## rsnitch-rs
 
-Rust iced-rs UI like sntop, but with buttons you can poke.
+Under development. Usable, but unpretty.
+
+Rust *iced-rs* UI like *sntop*, but with buttons you can poke.
 
 Filter view by group.
 
-RSNITCH_RS environment points to hosts JSON file, defaults to `~/.rsnitch-rs/hosts.json`
+RSNITCH_RS environment variable points to a hosts JSON file, defaults to 
+
+`~/.rsnitch-rs/hosts.json`
 
 ```
 [
@@ -15,5 +19,43 @@ RSNITCH_RS environment points to hosts JSON file, defaults to `~/.rsnitch-rs/hos
         },
         ...
 ]
+```
+
+
+
+Building *rsnitch*
+
+------
+
+You can build *rsnitch* through the usual mechanism.
+
+```
+cargo build
+```
+
+The included `makefile` has some convenience functions
+
+```
+make help
+```
+
+will tell you about them. For example,
+
+```
+make commit
+```
+
+runs the formatter and linters.
+
+
+
+Running *rsnitch*
+
+------
+
+Create a `~/.rsnitch-rs`directory and put your `hosts.json` in it. You can test a `hosts.json` by pointing to it with the RSNITCH_HOSTS env variable.
+
+```
+RSNITCH_HOSTS=path_to_host.json cargo run
 ```
 

@@ -1,10 +1,10 @@
 #
-# sntop-rs makefile
+# rsnitch-rs makefile
 #
-.PHONY: release run clean
+.PHONY: help debug release commit clean
 
 help:
-	@echo "sntop-rs top-level makefile -----------------"
+	@echo "rsnitch-rs top-level makefile -----------------"
 	@echo
 	@echo "--- build options"
 	@echo "    release - build release/optimized"

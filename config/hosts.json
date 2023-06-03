@@ -1,62 +1,22 @@
 [
         {
-            "group": "development",
-            "host": "fetch",
-            "label": "fetch"
+            "group": "local",
+            "host": "nas",
+            "label": "NAS"
         },
         {
-            "group": "server",
-            "host": "decatur",
-            "label": "decatur"
+            "group": "projects",
+            "host": "github.com",
+            "label": "github"
         },
         {
-            "group": "desktop",
-            "host": "vortex",
-            "label": "vortex"
+            "group": "news",
+            "host": "news.ycombinator.com",
+            "label": "HN"
         },
         {
-            "group": "server",
-            "host": "retro-12",
-            "label": "retro-12"
-        },
-        {
-            "group": "tablet",
-            "host": "scriven",
-            "label": "scriven"
-        },
-        {
-            "group": "tablet",
-            "host": "scriven-usb",
-            "label": "scriven-usb"
-        },
-        {
-            "group": "development",
-            "host": "aarch64",
-            "label": "aarch64"
-        },
-        {
-            "group": "development",
-            "host": "x86-64",
-            "label": "x86-64"
-        },
-        {
-            "group": "development",
-            "host": "xeon",
-            "label": "xeon"
-        },
-        {
-            "group": "desktop",
-            "host": "dyad",
-            "label": "dyad"
-        },
-        {
-            "group": "cluster",
-            "host": "tau",
-            "label": "tau"
-        },
-        {
-            "group": "cluster",
-            "host": "tau-monitor",
-            "label": "tau-monitor"
-        }
+            "group": "search",
+            "host": "google.com",
+            "label": "google"
+        }    
 ]
