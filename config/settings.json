@@ -1,0 +1,14 @@
+{
+    "Settings" : {
+        "window" : {
+            "size" : "None",
+            "min_size" : "None",
+            "max_size" : "None",
+            "resizable" : "None"
+        },
+        "ui" : {
+            "rows" : "None",
+            "cursor" : "None"
+        }
+    }
+}
