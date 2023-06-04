@@ -4,16 +4,15 @@
 
 use {
     super::{
-        controls_box::Controls, group_box::GroupBox, host::Host, info_box::InfoBox,
-        status_bar::StatusBar, widgets::quad::quad,
+        controls_box::Controls, group_box::GroupBox, host::Host, host_box::HostBox,
+        info_box::InfoBox, status_bar::StatusBar, widgets::quad::quad,
     },
     crate::Environment,
     iced::{
-        executor, subscription, theme,
-        widget::{container, text, Column},
+        executor, subscription,
+        widget::{container, Column},
         window, Alignment, Application, Command, Element, Event, Length, Subscription, Theme,
     },
-    iced_aw::Grid,
     std::sync::RwLock,
     time,
 };
@@ -24,6 +23,7 @@ pub struct Ui {
     group_box: GroupBox,
     groups: Vec<String>,
     hosts: Option<Vec<Host>>,
+    host_box: HostBox,
     info_box: InfoBox,
     last: Vec<Event>,
     states: RwLock<Vec<bool>>,
@@ -42,18 +42,6 @@ pub enum Message {
 
 impl Ui {
     const POLL_INTERVAL: u64 = 10; // sntop uses 180 seconds by default
-    const BUTTON_COLS: usize = 4;
-
-    pub fn effective_hid(&self, id: usize, name: &String) -> usize {
-        let hosts = self.hosts.as_ref().unwrap();
-        let filter = self.controls.get_filter();
-
-        if filter.is_empty() {
-            id
-        } else {
-            hosts.iter().position(|host| &host.host == name).unwrap()
-        }
-    }
 }
 
 impl Application for Ui {
@@ -85,6 +73,8 @@ impl Application for Ui {
 
         let status_bar = StatusBar::new(&env, String::new());
         let group_box = GroupBox::new(&env, 5);
+        let host_box = HostBox::new(&env, 5);
+        let info_box = InfoBox::new(6, 80);
 
         let ui = Ui {
             controls: Controls::new(),
@@ -92,7 +82,8 @@ impl Application for Ui {
             group_box,
             groups,
             hosts,
-            info_box: InfoBox::new(6, 80),
+            host_box,
+            info_box,
             last: Vec::<Event>::new(),
             states: RwLock::new(states),
             status_bar,
@@ -169,44 +160,13 @@ impl Application for Ui {
         let states = self.states.read().unwrap();
         let filter = self.controls.get_filter();
 
-        let grid_spacer = "                                 ";
-
-        let mut button_grid = Grid::with_columns(Self::BUTTON_COLS);
-        for (id, host) in hosts
-            .iter()
-            .filter(|host| {
-                if filter.is_empty() {
-                    true
-                } else {
-                    host.group == *filter
-                }
-            })
-            .enumerate()
-        {
-            if id % Self::BUTTON_COLS == 0 {
-                for _ in 0..Self::BUTTON_COLS {
-                    button_grid.insert(text(grid_spacer));
-                }
-            }
-
-            button_grid.insert(
-                iced::widget::button(text(&host.label))
-                    .style(if states[self.effective_hid(id, &host.host)] {
-                        theme::Button::Primary
-                    } else {
-                        theme::Button::Secondary
-                    })
-                    .on_press(Message::HostPress(self.effective_hid(id, &host.host))),
-            );
-        }
-
         let content = Column::new()
             .align_items(Alignment::Start)
             .spacing(20)
             .push(self.group_box.view(&self.groups))
             .push(quad(500, 1))
             .push(self.info_box.view())
-            .push(button_grid)
+            .push(self.host_box.view(filter, hosts, &states))
             .push(quad(500, 1))
             .push(self.controls.view())
             .push(quad(500, 1))
