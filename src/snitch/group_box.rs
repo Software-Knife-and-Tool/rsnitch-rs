@@ -41,7 +41,6 @@ impl GroupBox {
 
             group_grid.insert(
                 iced::widget::button(text(group))
-                    // .width(70)
                     .height(30)
                     .style(theme::Button::Primary)
                     .on_press(Message::GroupPress(id)),
