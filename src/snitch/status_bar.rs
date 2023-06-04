@@ -46,7 +46,6 @@ impl StatusBar {
         container(content)
             .width(Length::Fill)
             .height(Length::Fill)
-            // .padding(10)
             .into()
     }
 }

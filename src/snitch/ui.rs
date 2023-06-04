@@ -4,7 +4,8 @@
 
 use {
     super::{
-        controls::Controls, host::Host, info::InfoBox, statusbar::StatusBar, widgets::quad::quad,
+        controls_box::Controls, group_box::GroupBox, host::Host, info_box::InfoBox,
+        status_bar::StatusBar, widgets::quad::quad,
     },
     crate::Environment,
     iced::{
@@ -20,6 +21,7 @@ use {
 pub struct Ui {
     controls: Controls,
     env: Environment,
+    group_box: GroupBox,
     groups: Vec<String>,
     hosts: Option<Vec<Host>>,
     info_box: InfoBox,
@@ -82,10 +84,12 @@ impl Application for Ui {
         }
 
         let status_bar = StatusBar::new(&env, String::new());
+        let group_box = GroupBox::new(&env, 5);
 
         let ui = Ui {
             controls: Controls::new(),
             env,
+            group_box,
             groups,
             hosts,
             info_box: InfoBox::new(6, 80),
@@ -159,28 +163,13 @@ impl Application for Ui {
         })
     }
 
+    //            let group_box = GroupBox::new(&self.env, 5, self.groups);
     fn view(&self) -> Element<Message> {
         let hosts = self.hosts.as_ref().unwrap();
         let states = self.states.read().unwrap();
-        let groups = &self.groups;
         let filter = self.controls.get_filter();
 
         let grid_spacer = "                                 ";
-
-        let mut group_grid = Grid::with_columns(Self::BUTTON_COLS);
-        for (id, group) in groups.iter().enumerate() {
-            if id % Self::BUTTON_COLS == 0 {
-                for _ in 0..Self::BUTTON_COLS {
-                    group_grid.insert(text(grid_spacer));
-                }
-            }
-
-            group_grid.insert(
-                iced::widget::button(text(group))
-                    .style(theme::Button::Primary)
-                    .on_press(Message::GroupPress(id)),
-            );
-        }
 
         let mut button_grid = Grid::with_columns(Self::BUTTON_COLS);
         for (id, host) in hosts
@@ -214,7 +203,7 @@ impl Application for Ui {
         let content = Column::new()
             .align_items(Alignment::Start)
             .spacing(20)
-            .push(group_grid)
+            .push(self.group_box.view(&self.groups))
             .push(quad(500, 1))
             .push(self.info_box.view())
             .push(button_grid)
