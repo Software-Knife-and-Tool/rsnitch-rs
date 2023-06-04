@@ -4,8 +4,13 @@
 
 use {
     super::{
-        controls_box::Controls, group_box::GroupBox, host::Host, host_box::HostBox,
-        info_box::InfoBox, status_bar::StatusBar, widgets::quad::quad,
+        controls_box::Controls,
+        group_box::GroupBox,
+        host::{Host, Poll},
+        host_box::HostBox,
+        info_box::InfoBox,
+        status_bar::StatusBar,
+        widgets::quad::quad,
     },
     crate::Environment,
     iced::{
@@ -22,6 +27,7 @@ pub struct Ui {
     env: Environment,
     group_box: GroupBox,
     groups: Vec<String>,
+    poll: Poll,
     hosts: Option<Vec<Host>>,
     host_box: HostBox,
     info_box: InfoBox,
@@ -54,11 +60,6 @@ impl Application for Ui {
         let hosts = Host::load(&env);
         let mut groups: Vec<String> = Vec::new();
 
-        let states = match &hosts {
-            Some(hosts) => hosts.iter().map(Host::is_up).collect(),
-            None => Vec::new(),
-        };
-
         match &hosts {
             Some(hosts) => {
                 for host in hosts {
@@ -74,18 +75,27 @@ impl Application for Ui {
         let status_bar = StatusBar::new(&env, String::new());
         let group_box = GroupBox::new(&env, 5);
         let host_box = HostBox::new(&env, 5);
-        let info_box = InfoBox::new(6, 80);
+        let info_box = InfoBox::new(&env, 6, 80);
+        let poll = Poll::new(&env);
+        let controls = Controls::new();
+        let last = Vec::<Event>::new();
+
+        let states = RwLock::new(match &hosts {
+            Some(hosts) => hosts.iter().map(|host| poll.poll(host)).collect(),
+            None => Vec::new(),
+        });
 
         let ui = Ui {
-            controls: Controls::new(),
+            controls,
             env,
             group_box,
             groups,
             hosts,
             host_box,
             info_box,
-            last: Vec::<Event>::new(),
-            states: RwLock::new(states),
+            poll,
+            last,
+            states,
             status_bar,
         };
 
@@ -102,7 +112,7 @@ impl Application for Ui {
                 Some(hosts) => {
                     let mut states = self.states.write().unwrap();
 
-                    *states = hosts.iter().map(Host::is_up).collect();
+                    *states = hosts.iter().map(|host| self.poll.poll(host)).collect();
                 }
                 None => (),
             },
@@ -122,13 +132,14 @@ impl Application for Ui {
                 self.info_box.scroll();
                 self.info_box.write(format!("label: {}", host.label));
                 self.info_box.scroll();
-                self.info_box.write(format!("info: {}", Host::info(host)));
+                self.info_box
+                    .write(format!("info: {}", Host::info(&self.poll, host)));
             }
             Message::ClockTick(_t) => match &self.hosts {
                 Some(hosts) => {
                     let mut states = self.states.write().unwrap();
 
-                    *states = hosts.iter().map(Host::is_up).collect();
+                    *states = hosts.iter().map(|host| self.poll.poll(host)).collect();
                 }
                 None => (),
             },
@@ -154,7 +165,6 @@ impl Application for Ui {
         })
     }
 
-    //            let group_box = GroupBox::new(&self.env, 5, self.groups);
     fn view(&self) -> Element<Message> {
         let hosts = self.hosts.as_ref().unwrap();
         let states = self.states.read().unwrap();

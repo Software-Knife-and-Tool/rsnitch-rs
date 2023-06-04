@@ -24,59 +24,8 @@ pub struct InfoBox {
     cols: usize,
 }
 
-#[derive(Debug, Default)]
-pub struct InfoBoxBuilder {
-    rows: Option<usize>,
-    cols: Option<usize>,
-}
-
-impl InfoBoxBuilder {
-    const ROWS: usize = 25;
-    const COLS: usize = 80;
-
-    pub fn new() -> Self {
-        InfoBoxBuilder {
-            rows: None,
-            cols: None,
-        }
-    }
-
-    pub fn rows(&self, rows: usize) -> Self {
-        InfoBoxBuilder {
-            rows: Some(rows),
-            cols: self.cols,
-        }
-    }
-
-    pub fn cols(&self, cols: usize) -> Self {
-        InfoBoxBuilder {
-            rows: self.rows,
-            cols: Some(cols),
-        }
-    }
-
-    pub fn build(&self) -> InfoBox {
-        let rows = match self.rows {
-            Some(rows) => rows,
-            None => Self::ROWS,
-        };
-
-        let cols = match self.cols {
-            Some(cols) => cols,
-            None => Self::COLS,
-        };
-
-        InfoBox {
-            image: RwLock::new(String::new()),
-            lines: RwLock::new(vec![String::new(); rows]),
-            rows,
-            cols,
-        }
-    }
-}
-
 impl InfoBox {
-    pub fn new(rows: usize, cols: usize) -> Self {
+    pub fn new(_nv: &Environment, rows: usize, cols: usize) -> Self {
         InfoBox {
             image: RwLock::new(String::new()),
             lines: RwLock::new(vec![String::new(); rows]),
