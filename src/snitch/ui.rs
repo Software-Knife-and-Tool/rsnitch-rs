@@ -81,7 +81,7 @@ impl Application for Ui {
         let last = Vec::<Event>::new();
 
         let states = RwLock::new(match &hosts {
-            Some(hosts) => hosts.iter().map(|host| poll.poll(host)).collect(),
+            Some(hosts) => poll.poll_all(hosts),
             None => Vec::new(),
         });
 
@@ -112,7 +112,7 @@ impl Application for Ui {
                 Some(hosts) => {
                     let mut states = self.states.write().unwrap();
 
-                    *states = hosts.iter().map(|host| self.poll.poll(host)).collect();
+                    *states = self.poll.poll_all(hosts);
                 }
                 None => (),
             },
@@ -139,7 +139,7 @@ impl Application for Ui {
                 Some(hosts) => {
                     let mut states = self.states.write().unwrap();
 
-                    *states = hosts.iter().map(|host| self.poll.poll(host)).collect();
+                    *states = self.poll.poll_all(hosts);
                 }
                 None => (),
             },
