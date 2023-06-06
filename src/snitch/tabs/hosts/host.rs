@@ -3,7 +3,6 @@
 #![allow(unused_imports)]
 
 use {
-    super::ui::Ui,
     crate::Environment,
     dns_lookup::lookup_host,
     fastping_rs::{

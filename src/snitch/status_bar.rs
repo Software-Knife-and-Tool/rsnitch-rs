@@ -3,7 +3,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(unused_imports)]
 use {
-    super::ui::Message,
+    super::tab_ui::Message,
     crate::Environment,
     iced::{
         executor,

@@ -3,15 +3,16 @@
 #![allow(clippy::collapsible_match)]
 #![allow(unused_imports)]
 use {
-    super::{host::Host, ui::Message},
+    super::super::hosts_tab::HostsMessage,
+    super::{super::super::tab_ui::Message, host::Host},
     crate::Environment,
     iced::{
         executor,
         keyboard::Event::CharacterReceived,
         subscription, theme,
         widget::{button, column, container, row, rule, text, Column, Space, Text},
-        window, Alignment, Application, Color, Command, Element, Event, Length, Subscription,
-        Theme,
+        window, Alignment, Application, Color, Command, Element, Event, Length, Renderer,
+        Subscription, Theme,
     },
     iced_aw::Grid,
     std::sync::RwLock,
@@ -41,7 +42,12 @@ impl HostBox {
         }
     }
 
-    pub fn view(&self, filter: String, hosts: &[Host], states: &[bool]) -> Element<Message> {
+    pub fn view(
+        &self,
+        filter: String,
+        hosts: &[Host],
+        states: &[bool],
+    ) -> Element<'_, HostsMessage, Renderer> {
         let grid_spacer = "                                 ";
 
         let mut host_grid = Grid::with_columns(self.cols);
@@ -78,7 +84,7 @@ impl HostBox {
                     } else {
                         theme::Button::Secondary
                     })
-                    .on_press(Message::HostPress(host_id)),
+                    .on_press(HostsMessage::HostPress(host_id)),
             );
         }
 

@@ -3,7 +3,8 @@
 #![allow(clippy::collapsible_match)]
 #![allow(unused_imports)]
 use {
-    super::ui::Message,
+    super::super::super::tab_ui::Message,
+    super::super::hosts_tab::HostsMessage,
     iced::{
         executor,
         keyboard::Event::CharacterReceived,
@@ -46,8 +47,8 @@ impl Controls {
             text("rsnitch-rs: v0.0.2".to_string()).size(28),
             text(format!("filter: {}", filter)).size(24),
             row![
-                iced::widget::button(text("clear filter")).on_press(Message::Clear),
-                iced::widget::button(text("poll")).on_press(Message::Poll),
+                iced::widget::button(text("clear filter")).on_press(HostsMessage::Clear),
+                iced::widget::button(text("poll")).on_press(HostsMessage::Poll),
             ]
             .align_items(Alignment::End),
         ];

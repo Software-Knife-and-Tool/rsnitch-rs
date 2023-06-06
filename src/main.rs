@@ -8,7 +8,7 @@ mod snitch;
 use {
     iced::{Application, Settings},
     serde::{Deserialize, Serialize},
-    snitch::ui::Ui,
+    snitch::tab_ui::TabUi,
 };
 
 #[derive(Default, Serialize, Deserialize)]
@@ -79,8 +79,8 @@ pub fn main() -> iced::Result {
 
     sudo::with_env(&["HOME", "USER", "RSNITCH_HOSTS", "XDG_RUNTIME_DIR"]).expect("sudo failed");
 
-    Ui::run(Settings {
-        exit_on_close_request: false,
+    TabUi::run(Settings {
+        exit_on_close_request: true,
         flags: env,
         ..Settings::default()
     })
