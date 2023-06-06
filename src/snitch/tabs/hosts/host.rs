@@ -111,7 +111,7 @@ impl Host {
     }
 
     pub fn load(env: &Environment) -> Option<Vec<Host>> {
-        let dot_path = &std::path::Path::join(&env.dot_path, "hosts.json");
+        let dot_path = &std::path::Path::join(&env.config_path, "hosts.json");
         let path = match &env.hosts_path {
             Some(path) => path,
             None => dot_path,

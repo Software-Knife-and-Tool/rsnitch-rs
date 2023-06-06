@@ -8,7 +8,6 @@ use {
     super::super::tab_ui::{Message, Tab},
     crate::Environment,
     iced::{
-        alignment::{Horizontal, Vertical},
         widget::{Column, Container, Radio, Text},
         Element,
     },
@@ -88,7 +87,7 @@ impl Tab for SettingsTab {
     type Message = Message;
 
     fn title(&self) -> String {
-        String::from("Ariel::Settings")
+        String::from("rsnitch::settings")
     }
 
     fn tab_label(&self) -> TabLabel {
@@ -128,8 +127,6 @@ impl Tab for SettingsTab {
                     }),
                 ),
         )
-        .align_x(Horizontal::Center)
-        .align_y(Vertical::Top)
         .into();
 
         content.map(Message::Settings)
