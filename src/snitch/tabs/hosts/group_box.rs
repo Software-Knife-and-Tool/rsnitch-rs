@@ -3,15 +3,16 @@
 #![allow(clippy::collapsible_match)]
 #![allow(unused_imports)]
 use {
-    super::ui::Message,
+    super::super::super::tab_ui::Message,
+    super::super::hosts_tab::HostsMessage,
     crate::Environment,
     iced::{
         executor,
         keyboard::Event::CharacterReceived,
         subscription, theme,
         widget::{button, column, container, row, rule, text, Column, Space, Text},
-        window, Alignment, Application, Color, Command, Element, Event, Length, Subscription,
-        Theme,
+        window, Alignment, Application, Color, Command, Element, Event, Length, Renderer,
+        Subscription, Theme,
     },
     iced_aw::Grid,
     std::sync::RwLock,
@@ -27,7 +28,7 @@ impl GroupBox {
         GroupBox { cols }
     }
 
-    pub fn view(&self, groups: &[String]) -> Element<Message> {
+    pub fn view(&self, groups: &[String]) -> iced_native::Element<'_, HostsMessage, Renderer> {
         let grid_spacer = "                                 ";
 
         let mut group_grid = Grid::with_columns(self.cols);
@@ -43,7 +44,7 @@ impl GroupBox {
                 iced::widget::button(text(group))
                     .height(30)
                     .style(theme::Button::Primary)
-                    .on_press(Message::GroupPress(id)),
+                    .on_press(HostsMessage::GroupPress(id)),
             );
         }
 

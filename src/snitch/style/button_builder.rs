@@ -3,11 +3,10 @@
 #![allow(unused_imports)]
 
 use {
-    super::ui::Message,
+    super::super::tab_ui::Message,
     crate::Environment,
     iced::{
-        executor,
-        subscription, theme,
+        executor, subscription, theme,
         widget::{button, column, container, row, rule, text, Column, Space, Text},
         window, Alignment, Application, Color, Command, Element, Event, Length, Subscription,
         Theme,
@@ -15,9 +14,7 @@ use {
 };
 
 #[derive(Debug, Default)]
-pub struct Button {
-
-}
+pub struct Button {}
 
 #[derive(Debug, Default)]
 pub struct InfoBoxBuilder {

@@ -3,15 +3,16 @@
 #![allow(unused_imports)]
 
 use {
-    super::ui::Message,
+    super::super::super::tab_ui::Message,
+    super::super::hosts_tab::HostsMessage,
     crate::Environment,
     iced::{
         executor,
         keyboard::Event::CharacterReceived,
         subscription, theme,
         widget::{button, column, container, row, rule, text, Column, Space, Text},
-        window, Alignment, Application, Color, Command, Element, Event, Length, Subscription,
-        Theme,
+        window, Alignment, Application, Color, Command, Element, Event, Length, Renderer,
+        Subscription, Theme,
     },
     std::sync::RwLock,
 };
@@ -117,7 +118,7 @@ impl InfoBox {
         image.clone()
     }
 
-    pub fn view(&self) -> Element<Message> {
+    pub fn view(&self) -> Element<'_, HostsMessage, Renderer> {
         Column::new().push(text(self.contents())).into()
     }
 }
