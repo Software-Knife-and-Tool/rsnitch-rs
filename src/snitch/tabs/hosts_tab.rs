@@ -7,10 +7,7 @@
 #![allow(clippy::new_without_default)]
 #![allow(dead_code)]
 use {
-    super::super::{
-        style::quad::quad,
-        tab_ui::{Message, Tab},
-    },
+    super::super::tab_ui::{Message, Tab},
     super::hosts::{
         group_box::GroupBox,
         host::{Host, Poll},
@@ -137,10 +134,9 @@ impl HostsTab {
             .align_items(Alignment::Start)
             .spacing(20)
             .push(self.group_box.view(&self.groups))
-            .push(quad(500, 1))
+            //.push(quad(500, 1))
             .push(self.info_box.view())
-            .push(self.host_box.view("".to_string(), hosts, &states))
-            .push(quad(500, 1));
+            .push(self.host_box.view("".to_string(), hosts, &states));
 
         container(content)
             .width(Length::Fill)

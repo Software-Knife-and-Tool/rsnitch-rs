@@ -55,7 +55,7 @@ impl Application for TabUi {
             hosts_tab: HostsTab::new(&env),
             // controls_tab: ControlsTab::new(&env),
             settings_tab: SettingsTab::new(&env),
-            status_bar: StatusBar::new(&env, "hello martin".to_string()),
+            status_bar: StatusBar::new(&env, "rsnitch status bar:".to_string()),
             poll_interval_secs: Self::POLL_INTERVAL,
         };
 
@@ -63,7 +63,7 @@ impl Application for TabUi {
     }
 
     fn title(&self) -> String {
-        String::from("TabUi")
+        String::from("rsnitch 0.0.1")
     }
 
     fn update(&mut self, message: Self::Message) -> Command<Message> {
@@ -73,11 +73,11 @@ impl Application for TabUi {
             }
             Message::Hosts(message) => self.hosts_tab.update(message),
             // Message::Controls(message) => self.controls_tab.update(message),
-            // Message::Settings(message) => self.settings_tab.update(message),
+            Message::Settings(message) => self.settings_tab.update(message),
             Message::ClockTick(t) => {
                 self.hosts_tab.update(HostsMessage::ClockTick(t));
                 //  self.controls_tab.update(ControlsMessage::ClockTick(t));
-                //  self.settings_tab.update(SettingsMessage::ClockTick(t));
+                self.settings_tab.update(SettingsMessage::ClockTick(t));
             }
             Message::EventOccurred(event)
                 if event == Event::Window(window::Event::CloseRequested) =>
@@ -117,7 +117,7 @@ impl Application for TabUi {
             .tab_bar_theme
             .unwrap_or_default();
 
-        Tabs::new(self.active_tab, Message::TabSelected)
+        let tabs = Tabs::new(self.active_tab, Message::TabSelected)
             .push(self.hosts_tab.tab_label(), self.hosts_tab.content())
             // .push(self.controls_tab.tab_label(), self.controls_tab.view())
             .push(self.settings_tab.tab_label(), self.settings_tab.content())
@@ -125,8 +125,9 @@ impl Application for TabUi {
             .tab_bar_position(match position {
                 TabBarPosition::Top => iced_aw::TabBarPosition::Top,
                 TabBarPosition::Bottom => iced_aw::TabBarPosition::Bottom,
-            })
-            .into()
+            });
+
+        tabs.into()
     }
 }
 

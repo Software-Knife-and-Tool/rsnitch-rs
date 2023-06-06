@@ -43,7 +43,7 @@ impl Settings {
     };
 
     pub fn from_env(env: &Environment) -> Option<Self> {
-        let dot_path = env.dot_path.as_path();
+        let dot_path = env.config_path.as_path();
 
         if dot_path.exists() {
             // let settings = std::path::Path::new(Environment::SETTINGS_FILE);
