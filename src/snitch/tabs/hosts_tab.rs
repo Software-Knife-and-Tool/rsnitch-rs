@@ -7,17 +7,19 @@
 #![allow(clippy::new_without_default)]
 #![allow(dead_code)]
 use {
-    super::super::tab_ui::{Message, Tab},
-    super::hosts::{
-        group_box::GroupBox,
-        host::{Host, Poll},
-        host_box::HostBox,
-        info_box::InfoBox,
+    super::{
+        super::tab_ui::{Message, Tab},
+        hosts::{
+            group_box::GroupBox,
+            host::{Host, Poll},
+            host_box::HostBox,
+            info_box::InfoBox,
+        },
     },
     crate::Environment,
     iced::{
         alignment::{Horizontal, Vertical},
-        widget::{container, Column, Container},
+        widget::{container, horizontal_rule, Column, Container, Row},
         Alignment, Element, Event, Length,
     },
     iced_aw::tab_bar::TabLabel,
@@ -130,13 +132,21 @@ impl HostsTab {
         let states = self.states.read().unwrap();
         // let filter = self.controls.get_filter();
 
-        let content = Column::new()
+        let button_col = Column::new()
             .align_items(Alignment::Start)
-            .spacing(20)
             .push(self.group_box.view(&self.groups))
-            //.push(quad(500, 1))
-            .push(self.info_box.view())
+            .push(horizontal_rule(1))
             .push(self.host_box.view("".to_string(), hosts, &states));
+
+        let info_col = Column::new()
+            .align_items(Alignment::Start)
+            .push(self.info_box.view());
+
+        let content = Row::new()
+            .align_items(Alignment::Start)
+            .spacing(5)
+            .push(info_col.width(400))
+            .push(button_col);
 
         container(content)
             .width(Length::Fill)
