@@ -10,9 +10,9 @@ use {
     super::host::{Host, Poll},
     crate::Environment,
     iced::{
-        alignment::{Horizontal, Vertical},
+        alignment::{self, Horizontal, Vertical},
         executor, subscription, theme,
-        widget::{container, horizontal_rule, row, text, Column, Container, Row, Text},
+        widget::{container, horizontal_rule, row, text, Column, Container, Row, Scrollable, Text},
         window, Alignment, Application, Command, Element, Event, Length, Renderer, Subscription,
         Theme,
     },
@@ -157,10 +157,12 @@ impl GroupBox {
             );
         }
 
-        let content = Column::new()
-            .align_items(Alignment::Start)
-            .spacing(20)
-            .push(group_grid);
+        let content = Scrollable::new(
+            Column::new()
+                .align_items(Alignment::Start)
+                .spacing(20)
+                .push(group_grid),
+        );
 
         container(content)
             .width(Length::Fill)
@@ -239,10 +241,12 @@ impl HostBox {
             );
         }
 
-        let content = Column::new()
-            .align_items(Alignment::Start)
-            .spacing(20)
-            .push(host_grid);
+        let content = Scrollable::new(
+            Column::new()
+                .align_items(Alignment::Start)
+                .spacing(20)
+                .push(host_grid),
+        );
 
         container(content)
             .width(Length::Fill)
@@ -267,12 +271,26 @@ impl StatusBar {
     }
 
     pub fn view(&self, filter: String) -> Element<Message> {
-        let status_bar = text(format!("{}    {}", self.host_path.clone(), filter)).size(20);
+        let filter = text(format!("filter: {}", filter)).size(20);
+        let host_path = text(self.host_path.clone()).size(20);
+        let buttons = row![
+            iced::widget::button(text("clear".to_string()))
+                .height(30)
+                .style(theme::Button::Primary)
+                .on_press(Message::Clear),
+            iced::widget::button(text("refresh".to_string()))
+                .height(30)
+                .style(theme::Button::Primary)
+                .on_press(Message::Poll)
+        ]
+        .spacing(10);
 
         let content = Row::new()
-            .align_items(Alignment::Start)
+            .align_items(Alignment::Center)
             .spacing(10)
-            .push(status_bar);
+            .push(host_path.width(Length::Fill))
+            .push(filter.width(Length::Fill))
+            .push(buttons.width(Length::Shrink));
 
         container(content)
             .width(Length::Fill)
@@ -462,7 +480,7 @@ impl Application for SnitchUi {
             .spacing(10)
             .push(Text::new(self.title()).size(Self::HEADER_TEXT_SIZE))
             .push(horizontal_rule(1))
-            .push(hosts_frame.height(400))
+            .push(hosts_frame.height(385))
             .push(horizontal_rule(1))
             .push(self.status_bar.view(filter.to_string()))
             .push(horizontal_rule(1));
