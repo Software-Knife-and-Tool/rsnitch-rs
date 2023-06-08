@@ -6,7 +6,7 @@ mod settings;
 mod snitch;
 
 use {
-    iced::{Application, Settings},
+    iced::{window, Application, Settings},
     serde::{Deserialize, Serialize},
     snitch::snitch_ui::SnitchUi,
 };
@@ -65,23 +65,19 @@ pub fn main() -> iced::Result {
     }
     .dotfiles();
 
-    /*
-    let settings = Settings {
-        window: window::Settings {
-            size: (800, 600),
-            resizeable: true,
-            decorations: true,
-        },
-        // default_font: Some(include_bytes!("path-to-font ttf")),
-        antialiasing: true,
-    }
-     */
-
     sudo::with_env(&["HOME", "USER", "RSNITCH_HOSTS", "XDG_RUNTIME_DIR"]).expect("sudo failed");
 
     SnitchUi::run(Settings {
         exit_on_close_request: true,
         flags: env,
-        ..Settings::default()
+        window: window::Settings {
+            size: (1000, 500),
+            resizable: false,
+            decorations: true,
+            ..Default::default()
+        },
+        // default_font: Some(include_bytes!("path-to-font ttf")),
+        antialiasing: true,
+        ..Default::default()
     })
 }
