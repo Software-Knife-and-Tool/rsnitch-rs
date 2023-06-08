@@ -440,7 +440,11 @@ impl Application for SnitchUi {
 
         let button_col = Column::new()
             .align_items(Alignment::Start)
-            .push(self.group_box.view(&self.groups))
+            .push(
+                Column::new()
+                    .push(self.group_box.view(&self.groups))
+                    .height(150),
+            )
             .push(horizontal_rule(1))
             .push(self.host_box.view(filter.to_string(), hosts, &states));
 
@@ -455,12 +459,13 @@ impl Application for SnitchUi {
             .push(button_col);
 
         let snitch = Column::new()
-            .spacing(20)
+            .spacing(10)
             .push(Text::new(self.title()).size(Self::HEADER_TEXT_SIZE))
             .push(horizontal_rule(1))
-            .push(hosts_frame)
+            .push(hosts_frame.height(400))
             .push(horizontal_rule(1))
-            .push(self.status_bar.view(filter.to_string()));
+            .push(self.status_bar.view(filter.to_string()))
+            .push(horizontal_rule(1));
 
         container(snitch)
             .width(Length::Fill)
