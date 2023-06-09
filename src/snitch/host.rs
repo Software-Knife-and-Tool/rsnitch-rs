@@ -22,7 +22,7 @@ use {
 };
 
 pub struct Poll {
-    pinger: Pinger,
+    pinger: RwLock<Pinger>,
     results: Receiver<PingResult>,
 }
 
@@ -33,15 +33,20 @@ impl Poll {
             Err(e) => panic!("Error creating pinger: {}", e),
         };
 
-        Self { pinger, results }
+        Self {
+            pinger: RwLock::new(pinger),
+            results,
+        }
     }
 
     pub fn poll(&self, host: &Host) -> bool {
+        let pinger = self.pinger.write().unwrap();
+
         match lookup_host(&host.host) {
             Ok(ips) => {
                 let ip_addr = ips[0];
-                self.pinger.add_ipaddr(&ip_addr.to_string());
-                self.pinger.run_pinger();
+                pinger.add_ipaddr(&ip_addr.to_string());
+                pinger.run_pinger();
 
                 let state = match self.results.recv() {
                     Ok(result) => match result {
@@ -51,7 +56,7 @@ impl Poll {
                     Err(_) => false, // panic!("Worker threads disconnected before the solution was found!"),
                 };
 
-                self.pinger.remove_ipaddr(&ip_addr.to_string());
+                pinger.remove_ipaddr(&ip_addr.to_string());
 
                 state
             }
@@ -61,20 +66,21 @@ impl Poll {
 
     pub fn poll_all(&self, hosts: &[Host]) -> Vec<bool> {
         let mut states = vec![false; hosts.len()];
+        let pinger = self.pinger.write().unwrap();
 
         let ipaddrs: Vec<String> = hosts
             .iter()
             .map(|host| match lookup_host(&host.host) {
                 Ok(ips) => {
                     let ip_addr = ips[0].to_string();
-                    self.pinger.add_ipaddr(&ip_addr);
+                    pinger.add_ipaddr(&ip_addr);
                     ip_addr
                 }
                 Err(_) => "".to_string(),
             })
             .collect();
 
-        self.pinger.run_pinger();
+        pinger.run_pinger();
 
         for _ in 0..hosts.len() {
             let (addr, state) = match self.results.recv() {
@@ -85,6 +91,7 @@ impl Poll {
                 Err(_) => panic!("Worker threads disconnected before the solution was found!"),
             };
 
+            pinger.remove_ipaddr(&addr.to_string());
             states[ipaddrs
                 .iter()
                 .position(|ipaddr| &addr.to_string() == ipaddr)
