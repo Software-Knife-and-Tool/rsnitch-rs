@@ -28,7 +28,7 @@ pub struct Poll {
 
 impl Poll {
     pub fn new(_env: &Environment) -> Self {
-        let (pinger, results) = match Pinger::new(Some(500_u64), None) {
+        let (pinger, results) = match Pinger::new(Some(1000_u64), None) {
             Ok((pinger, results)) => (pinger, results),
             Err(e) => panic!("Error creating pinger: {}", e),
         };
@@ -60,6 +60,8 @@ impl Poll {
     }
 
     pub fn poll_all(&self, hosts: &[Host]) -> Vec<bool> {
+        let mut states = vec![false; hosts.len()];
+
         let ipaddrs: Vec<String> = hosts
             .iter()
             .map(|host| match lookup_host(&host.host) {
@@ -68,22 +70,28 @@ impl Poll {
                     self.pinger.add_ipaddr(&ip_addr);
                     ip_addr
                 }
-                Err(_) => "0.0.0.0".to_string(),
+                Err(_) => "".to_string(),
             })
             .collect();
 
         self.pinger.run_pinger();
 
-        ipaddrs
-            .iter()
-            .map(|_host| match self.results.recv() {
+        for _ in 0..hosts.len() {
+            let (addr, state) = match self.results.recv() {
                 Ok(result) => match result {
-                    Idle { addr: _ } => false,
-                    Receive { addr: _, rtt: _ } => true,
+                    Idle { addr } => (addr, false),
+                    Receive { addr, rtt: _ } => (addr, true),
                 },
-                Err(_) => false, // panic!("Worker threads disconnected before the solution was found!"),
-            })
-            .collect()
+                Err(_) => panic!("Worker threads disconnected before the solution was found!"),
+            };
+
+            states[ipaddrs
+                .iter()
+                .position(|ipaddr| &addr.to_string() == ipaddr)
+                .unwrap()] = state;
+        }
+
+        states
     }
 }
 

@@ -325,7 +325,7 @@ pub enum Message {
 }
 
 impl SnitchUi {
-    const POLL_INTERVAL: u64 = 10; // sntop uses 180 seconds by default
+    const POLL_INTERVAL: u64 = 180; // sntop uses 180 seconds by default
     const HEADER_TEXT_SIZE: u16 = 20;
     const FRAME_PADDING: u16 = 5;
 }
