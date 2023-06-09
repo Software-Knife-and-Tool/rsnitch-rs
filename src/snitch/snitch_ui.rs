@@ -274,20 +274,20 @@ impl StatusBar {
         let filter = text(format!("filter: {}", filter)).size(20);
         let host_path = text(self.host_path.clone()).size(20);
         let buttons = row![
-            iced::widget::button(text("clear".to_string()))
-                .height(30)
+            iced::widget::button(text("clear".to_string()).size(13))
+                .height(28)
                 .style(theme::Button::Primary)
                 .on_press(Message::Clear),
-            iced::widget::button(text("refresh".to_string()))
-                .height(30)
+            iced::widget::button(text("refresh".to_string()).size(13))
+                .height(28)
                 .style(theme::Button::Primary)
                 .on_press(Message::Poll)
         ]
-        .spacing(10);
+        .spacing(8);
 
         let content = Row::new()
             .align_items(Alignment::Center)
-            .spacing(10)
+            .spacing(6)
             .push(host_path.width(Length::Fill))
             .push(filter.width(Length::Fill))
             .push(buttons.width(Length::Shrink));
@@ -477,10 +477,10 @@ impl Application for SnitchUi {
             .push(button_col);
 
         let snitch = Column::new()
-            .spacing(10)
+            .spacing(8)
             .push(Text::new(self.title()).size(Self::HEADER_TEXT_SIZE))
             .push(horizontal_rule(1))
-            .push(hosts_frame.height(385))
+            .push(hosts_frame.height(400))
             .push(horizontal_rule(1))
             .push(self.status_bar.view(filter.to_string()))
             .push(horizontal_rule(1));
