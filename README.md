@@ -53,7 +53,7 @@ Running *rsnitch*
 
 ------
 
-Create a `~/.rsnitch-rs`directory and put your `hosts.json` in it. You can test a `hosts.json` by pointing to it with the RSNITCH_HOSTS env variable.
+Create a `~/.config/.rsnitch-rs`directory and put your `hosts.json` in it. You can use a `hosts.json` by pointing directly to it with the RSNITCH_HOSTS environment variable.
 
 ```
 RSNITCH_HOSTS=path_to_host.json cargo run
