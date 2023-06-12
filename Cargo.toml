@@ -40,10 +40,6 @@ version = "0.8.0"
 [workspace.dependencies.iced]
 version = "0.9.0"
 
-[workspace.dependencies.iced_aw]
-path = "./"
-default-features = false
-
 [package.metadata.deb]
 assets = [
     ["target/release-opt/sntop-rs", "usr/bin/sntop-rs", "755"],
