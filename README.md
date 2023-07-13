@@ -47,7 +47,7 @@ make commit
 
 runs the formatter and linters.
 
-
+You may need to install `libfontconfig1-dev` to satisfy the iced dependency. 
 
 Running *rsnitch*
 
