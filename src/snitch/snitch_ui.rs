@@ -160,7 +160,7 @@ impl GroupBox {
         let content = Scrollable::new(
             Column::new()
                 .align_items(Alignment::Start)
-                .spacing(20)
+                .spacing(15)
                 .push(group_grid),
         );
 
@@ -355,7 +355,7 @@ impl Application for SnitchUi {
         let filter = RwLock::new(String::new());
         let group_box = GroupBox::new(&env, 5);
         let host_box = HostBox::new(&env, 5);
-        let info_box = InfoBox::new(&env, 6, 80);
+        let info_box = InfoBox::new(&env, 6, 40);
         let last = Vec::<Event>::new();
         let poll = Poll::new(&env);
 
@@ -461,7 +461,7 @@ impl Application for SnitchUi {
             .push(
                 Column::new()
                     .push(self.group_box.view(&self.groups))
-                    .height(150),
+                    .height(100),
             )
             .push(horizontal_rule(1))
             .push(self.host_box.view(filter.to_string(), hosts, &states));
@@ -472,18 +472,15 @@ impl Application for SnitchUi {
 
         let hosts_frame = Row::new()
             .align_items(Alignment::Start)
-            .spacing(5)
-            .push(info_col.width(400))
+            .spacing(4)
+            .push(info_col.width(200))
             .push(button_col);
 
         let snitch = Column::new()
-            .spacing(8)
+            .spacing(4)
             .push(Text::new(self.title()).size(Self::HEADER_TEXT_SIZE))
-            .push(horizontal_rule(1))
-            .push(hosts_frame.height(400))
-            .push(horizontal_rule(1))
-            .push(self.status_bar.view(filter.to_string()))
-            .push(horizontal_rule(1));
+            .push(hosts_frame.height(340))
+            .push(self.status_bar.view(filter.to_string()));
 
         container(snitch)
             .width(Length::Fill)

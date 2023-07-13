@@ -71,7 +71,7 @@ pub fn main() -> iced::Result {
         exit_on_close_request: true,
         flags: env,
         window: window::Settings {
-            size: (1000, 500),
+            size: (800, 400),
             resizable: false,
             decorations: true,
             ..Default::default()
